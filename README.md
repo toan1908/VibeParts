@@ -1,49 +1,34 @@
 # VibeParts
 
-## Project Overview
-VibeParts is an innovative project designed to revolutionize the way users interact with parts and components for various applications. The goal is to provide a user-friendly platform where users can find, manage, and utilize parts efficiently.
+VibeParts la mot static web app de tim kiem linh kien dien tu, quan ly BOM, luu ghi chu, danh dau yeu thich va su dung bo calculator ky thuat ngay trong trinh duyet.
 
-## Features
-- **Extensive Database**: Access a comprehensive database of parts and components.
-- **User-Friendly Interface**: Navigate easily through an intuitive interface.
-- **Search Functionality**: Quickly find parts using advanced search options.
-- **Integration**: Integrate with other tools and platforms smoothly.
-- **Community Support**: Engage with a vibrant community for support and feedback.
+## Chay local
 
-## Installation Instructions
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/toan1908/VibeParts.git
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd VibeParts
-   ```
-3. Install the required dependencies:
-   ```bash
-   npm install
-   ```
-
-## Usage Guide
-To start the VibeParts application, run the following command:
 ```bash
 npm start
 ```
-Open your web browser and go to `http://localhost:3000` to access the application.
 
-## Contribution Guidelines
-We welcome contributions from the community. Please follow the steps below:
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix:
-   ```bash
-   git checkout -b feature/my-feature
-   ```
-3. Make your changes and commit them:
-   ```bash
-   git commit -m "Add my feature"
-   ```
-4. Push to the branch:
-   ```bash
-   git push origin feature/my-feature
-   ```
-5. Submit a pull request detailing your changes.
+Neu ban khong muon dung npm, co the mo truc tiep `index.html` trong trinh duyet, nhung chay qua local server se on dinh hon cho ES modules.
+
+## Cau truc
+
+- `index.html`: giao dien chinh
+- `css/styles.css`: toan bo giao dien
+- `js/`: logic tim kiem, BOM, ghi chu, calculator va online search
+
+## Deploy len GitHub Pages
+
+Repo nay la mot static site, vi vay co the publish truc tiep bang GitHub Pages.
+Trong repo GitHub, bo source duoc dat trong thu muc `docs/` de Pages co the deploy truc tiep tu nhanh `main`.
+
+1. Push toan bo source len nhanh `main`
+2. Vao `Settings -> Pages`
+3. Chon `Deploy from a branch`
+4. Chon branch `main` va folder `/docs`
+5. Luu lai va doi GitHub Pages build
+
+URL mac dinh cua project site se la:
+
+`https://toan1908.github.io/VibeParts/`
+
+File `.nojekyll` da duoc them san de GitHub Pages phuc vu static files truc tiep.
