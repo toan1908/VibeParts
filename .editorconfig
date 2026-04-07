@@ -1,0 +1,27 @@
+# editorconfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Unix and Windows newlines
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Basic Formatting
+[*]
+indent_style = space
+indent_size = 4
+
+# JavaScript
+[*.js]
+indent_size = 2
+
+# Python
+[*.py]
+indent_size = 4
+
+# Markdown
+[*.md]
+trim_trailing_whitespace = false
