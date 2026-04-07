@@ -68,8 +68,7 @@ const GEMINI_MODELS = [
   'gemini-2.5-flash',
   'gemini-3.1-flash',
   'gemini-2.0-flash',
-  'gemini-2.0-flash',
-  'gemini-1.5-flash',
+  'gemini-1.5-flash' // Đã xóa model bị lặp
 ];
 
 // ── Build prompt ──
@@ -88,7 +87,7 @@ Trả về ĐÚNG 1 mảng JSON (không có text ngoài JSON) chứa 1-5 linh ki
   "price_vnd": Giá tham khảo tại Việt Nam (chỉ số nguyên, đơn vị VND, ước lượng hợp lý)
 }
 
-Chỉ trả về JSON array thuần túy, không có markdown, không có giải thích.
+Chỉ trả về JSON array thuần túy.
 Giá tham khảo tại Việt Nam hợp lý (VD: IC đơn giản 3000-15000đ, MCU 25000-150000đ, module 50000-200000đ).`;
 }
 
@@ -104,6 +103,7 @@ async function tryModel(modelName, prompt, apiKey) {
       generationConfig: {
         temperature: 0.3,
         maxOutputTokens: 2048,
+        responseMimeType: "application/json" // QUAN TRỌNG: Ép output 100% là JSON
       },
     }),
   });
@@ -114,14 +114,21 @@ async function tryModel(modelName, prompt, apiKey) {
 
     // Quota exceeded → throw special error so we can try next model
     if (response.status === 429 || errMsg.toLowerCase().includes('quota') || errMsg.toLowerCase().includes('rate')) {
-      throw { isQuota: true, model: modelName, message: errMsg };
+      const error = new Error(errMsg);
+      error.isQuota = true;
+      error.model = modelName;
+      throw error;
     }
 
     if (response.status === 400) {
-      throw { isInvalidKey: true, message: 'API key không hợp lệ.' };
+      const error = new Error('API key không hợp lệ.');
+      error.isInvalidKey = true;
+      throw error;
     }
     if (response.status === 403) {
-      throw { isInvalidKey: true, message: 'API key bị từ chối. Vui lòng kiểm tra lại.' };
+      const error = new Error('API key bị từ chối. Vui lòng kiểm tra lại.');
+      error.isInvalidKey = true;
+      throw error;
     }
 
     throw new Error(errMsg || `Lỗi API (${modelName}): ${response.status}`);
@@ -180,23 +187,10 @@ export async function searchOnline(query) {
 
 // ── Parse AI response text into components ──
 function parseAIResponse(text, query) {
-  let jsonStr = text.trim();
-
-  // Handle markdown code blocks
-  const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (jsonMatch) {
-    jsonStr = jsonMatch[1].trim();
-  }
-
-  // Try to find array in the text
-  const arrMatch = jsonStr.match(/\[[\s\S]*\]/);
-  if (arrMatch) {
-    jsonStr = arrMatch[0];
-  }
-
   let parsed;
   try {
-    parsed = JSON.parse(jsonStr);
+    // Không cần dùng regex nữa do đã ép trả về MIME type là application/json
+    parsed = JSON.parse(text.trim());
   } catch (e) {
     throw new Error('Không thể phân tích kết quả từ AI. Vui lòng thử lại.');
   }
