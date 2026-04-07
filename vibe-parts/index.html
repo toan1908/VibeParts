@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VibeParts | Tìm kiếm linh kiện điện tử & Quản lý BOM</title>
+  <meta name="description" content="Nền tảng tìm kiếm linh kiện điện tử và quản lý danh sách vật tư (BOM) cho kỹ sư Việt Nam. Tra cứu thông số, giá cả, datasheet nhanh chóng.">
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Icons: Phosphor -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ═══════════ HEADER ═══════════ -->
+  <header class="header" id="appHeader">
+    <div class="header-left">
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="ph ph-list"></i>
+      </button>
+      <a href="#" class="logo" id="logoLink">
+        <i class="ph-fill ph-lightning"></i>
+        <span>Vibe<strong>Parts</strong></span>
+      </a>
+      <nav class="header-nav" id="headerNav">
+        <button class="nav-tab active" data-tab="search" id="tabSearch">
+          <i class="ph ph-magnifying-glass"></i>
+          <span>Tìm kiếm</span>
+        </button>
+        <button class="nav-tab" data-tab="bom" id="tabBom">
+          <i class="ph ph-list-numbers"></i>
+          <span>Danh sách vật tư</span>
+          <span class="badge" id="bomBadge" style="display:none">0</span>
+        </button>
+        <button class="nav-tab" data-tab="calc" id="tabCalc">
+          <i class="ph ph-calculator"></i>
+          <span>Công cụ</span>
+        </button>
+      </nav>
+    </div>
+    <div class="header-right">
+      <button class="header-btn" id="guideBtn">
+        <i class="ph ph-question"></i>
+        <span>Hướng dẫn</span>
+      </button>
+      <button class="header-btn" id="compareBtn" style="display:none">
+        <i class="ph ph-swap"></i>
+        <span>So sánh (<span id="compareCount">0</span>)</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <i class="ph ph-moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════ MAIN LAYOUT ═══════════ -->
+  <div class="main-layout">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-title">
+        <i class="ph ph-funnel"></i>
+        Danh mục
+      </div>
+      <div class="category-list" id="categoryList">
+        <!-- "Chỉ yêu thích" will be prepended here by JS, followed by normal categories -->
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ══ MAIN CONTENT ══ -->
+    <main class="main-content">
+
+      <!-- ── SEARCH PAGE ── -->
+      <div class="page active" id="pageSearch">
+        <!-- Search Bar -->
+        <div class="search-section">
+          <div class="search-wrapper">
+            <i class="ph ph-magnifying-glass"></i>
+            <input
+              type="text"
+              class="search-input"
+              id="searchInput"
+              placeholder="Tìm kiếm theo tên, mô tả..."
+              autocomplete="off"
+            >
+            <div class="search-shortcut">
+              <kbd>Ctrl</kbd>
+              <kbd>K</kbd>
+            </div>
+          </div>
+          <button class="btn-search-online" id="searchOnlineBtn">
+            <i class="ph ph-globe"></i>
+            Tìm kiếm Online
+          </button>
+        </div>
+
+        <!-- Results Header -->
+        <div class="results-header">
+          <h2>
+            <span id="resultsTitle">Linh kiện</span>
+            <span class="results-count" id="resultsCount">(0)</span>
+          </h2>
+          <div class="results-actions">
+            <select class="sort-select" id="sortSelect">
+              <option value="name">Sắp xếp: Tên A-Z</option>
+              <option value="name-desc">Tên Z-A</option>
+              <option value="price-asc">Giá tăng dần</option>
+              <option value="price-desc">Giá giảm dần</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Component List -->
+        <div class="component-list" id="componentList">
+          <!-- Cards injected by JS -->
+        </div>
+      </div>
+
+      <!-- ── BOM PAGE ── -->
+      <div class="page" id="pageBom">
+        <!-- BOM Header Card -->
+        <div class="bom-header-card">
+          <div class="bom-header-info">
+            <h1><i class="ph ph-list-numbers"></i> Danh sách vật tư (BOM)</h1>
+            <p>Quản lý các linh kiện đã chọn và xuất file để mua sắm.</p>
+          </div>
+          <div class="bom-total-cost">
+            <div class="label">Tổng chi phí dự kiến</div>
+            <div class="amount" id="bomTotalCost">0 đ</div>
+          </div>
+          <div class="bom-header-actions">
+            <button class="btn btn-save-bom" id="saveBomBtn">
+              <i class="ph ph-floppy-disk"></i> Lưu
+            </button>
+            <button class="btn btn-export-csv" id="exportCsvBtn">
+              <i class="ph ph-file-csv"></i> CSV
+            </button>
+            <button class="btn btn-export-pdf" id="exportPdfBtn">
+              <i class="ph ph-file-pdf"></i> PDF
+            </button>
+            <button class="btn btn-clear-bom" id="clearBomBtn">
+              <i class="ph ph-trash"></i> Xóa tất cả
+            </button>
+          </div>
+        </div>
+
+        <!-- Analytics Dashboard -->
+        <div class="analytics-dashboard" id="bomAnalyticsDashboard" style="display: none;">
+          <div class="analytics-row">
+            <div class="analytics-card">
+              <h4>Phân bổ ngân sách</h4>
+              <canvas id="bomPieChart" width="200" height="200"></canvas>
+            </div>
+            <div class="analytics-card flex-2">
+              <h4>Top 5 đắt nhất</h4>
+              <canvas id="bomBarChart" width="400" height="200"></canvas>
+            </div>
+            <div class="analytics-stats">
+              <div class="stat-box">
+                <span>Tổng linh kiện</span>
+                <strong id="statTotalUnique">0</strong>
+              </div>
+              <div class="stat-box">
+                <span>Tổng số lượng</span>
+                <strong id="statTotalItems">0</strong>
+              </div>
+              <div class="stat-box">
+                <span>Giá trung bình</span>
+                <strong id="statAvgPrice">0 đ</strong>
+              </div>
+              <div class="stat-box">
+                <span>Đắt nhất</span>
+                <strong id="statMostExpensive" class="text-ellipsis">-</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOM Table -->
+        <div id="bomContent">
+          <!-- Injected by JS: table or empty state -->
+        </div>
+
+        <!-- Templates Section -->
+        <div class="templates-section">
+          <div class="section-title">
+            <i class="ph ph-copy"></i>
+            BOM Mẫu (Templates)
+          </div>
+          <div class="template-grid" id="templatesList">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Saved BOMs -->
+        <div class="saved-boms-section">
+          <div class="section-title">
+            <i class="ph ph-folder-open"></i>
+            BOM đã lưu
+          </div>
+          <div id="savedBomsList">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CALCULATOR PAGE ── -->
+      <div class="page" id="pageCalc">
+        <div class="calc-container">
+          <div class="calc-sidebar">
+            <div class="calc-sidebar-header">📍 CƠ BẢN (FUNDAMENTAL)</div>
+            <button class="calc-menu-item active" data-calc="ohmsLaw">
+              <i class="ph ph-lightning"></i> Định luật Ohm
+            </button>
+            <button class="calc-menu-item" data-calc="voltageDivider">
+              <i class="ph ph-arrows-merge"></i> Cầu chia áp
+            </button>
+            <button class="calc-menu-item" data-calc="currentDivider">
+              <i class="ph ph-arrows-split"></i> Cầu chia dòng
+            </button>
+            <button class="calc-menu-item" data-calc="rmsCalc">
+              <i class="ph ph-wave-sine"></i> Trị hiệu dụng (RMS)
+            </button>
+            <button class="calc-menu-item" data-calc="yDelta">
+              <i class="ph ph-triangle"></i> Sao - Tam giác (Y-Δ)
+            </button>
+
+            <div class="calc-sidebar-header">🧩 LINH KIỆN R-L-C</div>
+            <button class="calc-menu-item" data-calc="resistorColor">
+              <i class="ph ph-palette"></i> Mã màu Điện trở
+            </button>
+            <button class="calc-menu-item" data-calc="smdResistor">
+              <i class="ph ph-selection-all"></i> Mã điện trở dán (SMD)
+            </button>
+            <button class="calc-menu-item" data-calc="capCode">
+              <i class="ph ph-hash"></i> Mã tụ điện (Ceramic/Poly)
+            </button>
+            <button class="calc-menu-item" data-calc="serialParallelR">
+              <i class="ph ph-line-segments"></i> Ghép Nối Điện trở (S/P)
+            </button>
+            <button class="calc-menu-item" data-calc="serialParallelC">
+              <i class="ph ph-rows"></i> Ghép Nối Tụ điện (S/P)
+            </button>
+            <button class="calc-menu-item" data-calc="serialParallelL">
+              <i class="ph ph-spiral"></i> Ghép Nối Cuộn cảm (S/P)
+            </button>
+
+            <div class="calc-sidebar-header">🌐 MẠCH ĐIỆN & IC</div>
+            <button class="calc-menu-item" data-calc="rcTime">
+              <i class="ph ph-clock"></i> Hằng số thời gian RC
+            </button>
+            <button class="calc-menu-item" data-calc="ledResistor">
+              <i class="ph ph-lightbulb"></i> Trở hạn dòng LED
+            </button>
+            <button class="calc-menu-item" data-calc="ne555Timer">
+              <i class="ph ph-cpu"></i> Bộ định thời NE555
+            </button>
+            <button class="calc-menu-item" data-calc="ne555Mono">
+              <i class="ph ph-timer"></i> NE555 (Đơn ổn - Mono)
+            </button>
+            <button class="calc-menu-item" data-calc="rlcCircuit">
+              <i class="ph ph-lightning-slash"></i> Mạch xoay chiều RLC
+            </button>
+            <button class="calc-menu-item" data-calc="wheatstone">
+              <i class="ph ph-grid-four"></i> Cầu Wheatstone
+            </button>
+            <button class="calc-menu-item" data-calc="resonance">
+              <i class="ph ph-radio"></i> Cộng hưởng LC
+            </button>
+
+            <div class="calc-sidebar-header">🛡️ LINH KIỆN TÍCH CỰC & IC</div>
+            <button class="calc-menu-item" data-calc="opAmpInv">
+              <i class="ph ph-infinity"></i> Op-Amp (Inverting)
+            </button>
+            <button class="calc-menu-item" data-calc="opAmpNonInv">
+              <i class="ph ph-infinity"></i> Op-Amp (Non-Inv)
+            </button>
+            <button class="calc-menu-item" data-calc="opAmpDiff">
+              <i class="ph ph-infinity"></i> Op-Amp (Diff)
+            </button>
+            <button class="calc-menu-item" data-calc="zenerReg">
+              <i class="ph ph-shield-check"></i> Ổn áp Zener
+            </button>
+            <button class="calc-menu-item" data-calc="adjustedReg">
+              <i class="ph ph-toggle-left"></i> Ổn áp điều chỉnh (LM317)
+            </button>
+
+            <div class="calc-sidebar-header">📶 RF & CHUYỂN ĐỔI</div>
+            <button class="calc-menu-item" data-calc="decibelCalc">
+              <i class="ph ph-chart-line-up"></i> Máy tính Decibel (dB)
+            </button>
+            <button class="calc-menu-item" data-calc="dbmWatt">
+              <i class="ph ph-broadcast"></i> Chuyển đổi dBm / Watt
+            </button>
+
+            <div class="calc-sidebar-header">📏 THIẾT KẾ PCB & TỪ TÍNH</div>
+            <button class="calc-menu-item" data-calc="pcbTrace">
+              <i class="ph ph-ruler"></i> Độ rộng đường mạch PCB
+            </button>
+            <button class="calc-menu-item" data-calc="airCoreInd">
+              <i class="ph ph-spiral"></i> Cuộn cảm lõi không khí
+            </button>
+            <button class="calc-menu-item" data-calc="toroidInd">
+              <i class="ph ph-circle"></i> Cuộn cảm Toroid
+            </button>
+
+            <div class="calc-sidebar-header">📉 BỘ LỌC CHỦ ĐỘNG</div>
+            <button class="calc-menu-item" data-calc="filterLP">
+              <i class="ph ph-wave-sine"></i> Bộ lọc Thông thấp (LPF)
+            </button>
+            <button class="calc-menu-item" data-calc="filterHP">
+              <i class="ph ph-wave-sine"></i> Bộ lọc Thông cao (HPF)
+            </button>
+
+            <div class="calc-sidebar-header">📻 TRANSISTOR & RF CAO CẤP</div>
+            <button class="calc-menu-item" data-calc="ceLoadLine">
+              <i class="ph ph-chart-line"></i> BJT CE Load Line
+            </button>
+            <button class="calc-menu-item" data-calc="skinDepth">
+              <i class="ph ph-waves"></i> Hiệu ứng bề mặt (Skin Depth)
+            </button>
+          </div>
+          <div class="calc-content" id="calcContentArea">
+            <!-- Content injected by JS -->
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════ GUIDE MODAL ═══════════ -->
+  <div class="modal-overlay" id="guideModal">
+    <div class="modal" style="max-width: 800px;">
+      <div class="modal-header">
+        <h2><i class="ph-duotone ph-sparkle"></i> Khám phá VibeParts</h2>
+        <button class="modal-close" data-close-modal="guideModal">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 24px 32px;">
+        <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 15px; text-align: center;">Nền tảng quản lý linh kiện điện tử và tính toán kỹ thuật All-in-One.</p>
+        
+        <div class="guide-grid">
+          <!-- Card 1 -->
+          <div class="guide-card">
+            <div class="guide-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+              <i class="ph-duotone ph-magnifying-glass"></i>
+            </div>
+            <div>
+              <h3>Tra cứu thông minh</h3>
+              <p>Tìm kiếm linh kiện cục bộ siêu tốc với <kbd>Ctrl</kbd>+<kbd>K</kbd>. Lọc theo 8+ danh mục chuyên dụng.</p>
+            </div>
+          </div>
+          
+          <!-- Card 2 -->
+          <div class="guide-card">
+            <div class="guide-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+              <i class="ph-duotone ph-robot"></i>
+            </div>
+            <div>
+              <h3>AI Tìm kiếm Online</h3>
+              <p>Chưa có linh kiện? Nhờ AI tìm thông số và giá trực tiếp từ Internet, tự động thêm vào kho cá nhân.</p>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="guide-card">
+            <div class="guide-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+              <i class="ph-duotone ph-list-numbers"></i>
+            </div>
+            <div>
+              <h3>BOM Chuyên nghiệp</h3>
+              <p>Lên danh sách vật tư nhanh chóng. Tích hợp BOM mẫu, lưu trữ Offline, xuất file PDF & CSV.</p>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="guide-card">
+            <div class="guide-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+              <i class="ph-duotone ph-chart-pie-slice"></i>
+            </div>
+            <div>
+              <h3>Phân tích ngân sách</h3>
+              <p>Dashboard thống kê trực quan với biểu đồ tương tác, giúp bạn kiểm soát ngân sách tối ưu.</p>
+            </div>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="guide-card">
+            <div class="guide-icon" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+              <i class="ph-duotone ph-calculator"></i>
+            </div>
+            <div>
+              <h3>Công cụ kỹ thuật</h3>
+              <p>Tích hợp sẵn máy tính Định luật Ohm, Cầu chia áp, Trở cho LED, Mạch RC siêu tiện dụng.</p>
+            </div>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="guide-card">
+            <div class="guide-icon" style="background: rgba(14, 165, 233, 0.1); color: #0ea5e9;">
+              <i class="ph-duotone ph-swap"></i>
+            </div>
+            <div>
+              <h3>So sánh chi tiết</h3>
+              <p>So sánh cạnh nhau lên tới 4 linh kiện với các bảng thông số kỹ thuật rõ ràng để lựa chọn.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="guide-footer" style="padding-top: 20px;">
+        <button class="btn btn-primary" data-close-modal="guideModal" style="width: 100%; justify-content: center; font-weight: 600; padding: 12px; font-size: 15px;">
+          Bắt đầu sử dụng ngay
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ COMPARE MODAL ═══════════ -->
+  <div class="modal-overlay" id="compareModal">
+    <div class="modal" style="max-width: 900px;">
+      <div class="modal-header">
+        <h2><i class="ph ph-swap"></i> So sánh linh kiện</h2>
+        <button class="modal-close" data-close-modal="compareModal">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="compareBody">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SAVE BOM NAME MODAL ═══════════ -->
+  <div class="modal-overlay" id="saveBomModal">
+    <div class="modal" style="max-width: 420px;">
+      <div class="modal-header">
+        <h2><i class="ph ph-floppy-disk"></i> Lưu BOM</h2>
+        <button class="modal-close" data-close-modal="saveBomModal">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 16px;">
+          <label style="font-size: 14px; font-weight: 600; display: block; margin-bottom: 8px;">Tên danh sách vật tư</label>
+          <input
+            type="text"
+            id="bomNameInput"
+            class="search-input"
+            placeholder="VD: Dự án Robot Arm v2"
+            style="padding-left: 16px;"
+          >
+        </div>
+        <button class="btn btn-primary" id="confirmSaveBom" style="width: 100%; justify-content: center;">
+          <i class="ph ph-floppy-disk"></i> Lưu BOM
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ ADD COMPONENT MODAL ═══════════ -->
+  <div class="modal-overlay" id="onlineSearchModal">
+    <div class="modal" style="max-width: 800px;">
+      <div class="modal-header">
+        <h2><i class="ph ph-plus-circle"></i> Thêm linh kiện</h2>
+        <button class="modal-close" data-close-modal="onlineSearchModal">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+
+      <!-- Modal Tabs -->
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-modal-tab="manual">
+          <i class="ph ph-pencil-simple"></i> Nhập thủ công
+        </button>
+        <button class="modal-tab" data-modal-tab="import">
+          <i class="ph ph-upload-simple"></i> Import JSON
+        </button>
+        <button class="modal-tab" data-modal-tab="ai">
+          <i class="ph ph-robot"></i> Tìm bằng AI
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- ═══ TAB 1: MANUAL ENTRY (No API needed) ═══ -->
+        <div class="modal-tab-content active" id="tabManual">
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            <i class="ph ph-info"></i> Nhập thông tin linh kiện. Linh kiện sẽ được lưu vào database cục bộ.
+          </p>
+          <form id="manualForm" autocomplete="off">
+            <div class="form-row">
+              <div class="form-group flex-2">
+                <label>Tên linh kiện *</label>
+                <input type="text" id="mfName" placeholder="VD: LM2596S, ACS712..." required>
+              </div>
+              <div class="form-group">
+                <label>Danh mục</label>
+                <select id="mfCategory">
+                  <option value="ic">IC</option>
+                  <option value="mcu">Vi điều khiển</option>
+                  <option value="sensor">Cảm biến</option>
+                  <option value="resistor">Điện trở</option>
+                  <option value="capacitor">Tụ điện</option>
+                  <option value="transistor">Transistor</option>
+                  <option value="diode">Diode</option>
+                  <option value="connector">Đầu nối</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nhà sản xuất</label>
+                <input type="text" id="mfManufacturer" placeholder="VD: Texas Instruments">
+              </div>
+              <div class="form-group">
+                <label>Package</label>
+                <input type="text" id="mfPackage" placeholder="VD: TO-220, DIP-8, SMD">
+              </div>
+              <div class="form-group">
+                <label>Giá (VND)</label>
+                <input type="number" id="mfPrice" placeholder="15000" min="0">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Mô tả</label>
+              <input type="text" id="mfDescription" placeholder="Mô tả ngắn gọn về chức năng linh kiện">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Voltage</label>
+                <input type="text" id="mfVoltage" placeholder="VD: 3.3V ~ 5V">
+              </div>
+              <div class="form-group">
+                <label>Current</label>
+                <input type="text" id="mfCurrent" placeholder="VD: 500mA">
+              </div>
+              <div class="form-group">
+                <label>Interface</label>
+                <input type="text" id="mfInterface" placeholder="VD: SPI, I2C">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-add-db" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; margin-top: 4px;">
+              <i class="ph ph-plus"></i> Thêm linh kiện vào Database
+            </button>
+          </form>
+        </div>
+
+        <!-- ═══ TAB 2: IMPORT JSON (No API needed) ═══ -->
+        <div class="modal-tab-content" id="tabImport">
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+            <i class="ph ph-info"></i> Dán mảng JSON chứa danh sách linh kiện. Mỗi phần tử cần ít nhất trường <code>name</code>.
+          </p>
+          <div class="form-group">
+            <label>JSON Data</label>
+            <textarea id="importJsonInput" rows="10" placeholder='[
+  {
+    "name": "LM2596S",
+    "manufacturer": "Texas Instruments",
+    "category": "ic",
+    "package": "TO-263",
+    "description": "Step-down DC-DC converter, 3A output",
+    "voltage": "4.5V ~ 40V",
+    "current": "3A",
+    "interface": "5-pin",
+    "price_vnd": 12000
+  }
+]'></textarea>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-add-db" id="importJsonBtn" style="flex: 1; justify-content: center; padding: 12px; font-size: 14px;">
+              <i class="ph ph-upload-simple"></i> Import linh kiện
+            </button>
+            <button class="btn btn-outline" id="importSampleBtn" style="padding: 12px;">
+              <i class="ph ph-clipboard-text"></i> Dán mẫu
+            </button>
+          </div>
+          <div id="importResult" style="margin-top: 12px;"></div>
+        </div>
+
+        <!-- ═══ TAB 3: AI SEARCH (Needs API key) ═══ -->
+        <div class="modal-tab-content" id="tabAi">
+          <!-- API Key Setup -->
+          <div id="apiKeySection">
+            <div class="online-search-info">
+              <i class="ph-duotone ph-robot" style="font-size: 40px; color: var(--primary); display: block; margin-bottom: 8px;"></i>
+              <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px;">
+                Tìm kiếm bằng <strong>Gemini AI</strong> — tự động tra cứu thông số linh kiện từ Internet.
+                Cần API key miễn phí. <em>Không bắt buộc — bạn vẫn có thể thêm thủ công ở tab bên trái.</em>
+              </p>
+              <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                <input
+                  type="password"
+                  id="apiKeyInput"
+                  class="search-input"
+                  placeholder="Dán Gemini API Key tại đây..."
+                  style="padding-left: 16px; flex: 1;"
+                >
+                <button class="btn btn-primary" id="saveApiKeyBtn">
+                  <i class="ph ph-key"></i> Lưu Key
+                </button>
+              </div>
+              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener"
+                 style="font-size: 13px; color: var(--primary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                <i class="ph ph-arrow-square-out"></i> Lấy API key miễn phí từ Google AI Studio
+              </a>
+            </div>
+          </div>
+
+          <!-- Search Form (shown after API key is set) -->
+          <div id="onlineSearchForm" style="display: none;">
+            <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+              <div class="search-wrapper" style="flex: 1;">
+                <i class="ph ph-globe"></i>
+                <input
+                  type="text"
+                  class="search-input"
+                  id="onlineQueryInput"
+                  placeholder="VD: cảm biến áp suất, relay 5V, IC khuếch đại..."
+                  autocomplete="off"
+                >
+              </div>
+              <button class="btn-search-online" id="doOnlineSearchBtn">
+                <i class="ph ph-magnifying-glass"></i>
+                Tìm kiếm
+              </button>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <span style="font-size: 12px; color: var(--text-muted);">
+                <i class="ph ph-info"></i> AI trả về specs + giá tham khảo • Nhấn "Thêm vào DB" để lưu
+              </span>
+              <button class="btn btn-outline" id="changeApiKeyBtn" style="padding: 4px 10px; font-size: 12px;">
+                <i class="ph ph-key"></i> Đổi Key
+              </button>
+            </div>
+          </div>
+
+          <!-- AI Search Results -->
+          <div id="onlineSearchResults"></div>
+
+          <!-- Loading State -->
+          <div id="onlineSearchLoading" style="display: none; text-align: center; padding: 40px;">
+            <div class="search-loading-spinner"></div>
+            <p style="margin-top: 16px; color: var(--text-secondary); font-size: 14px;">
+              <i class="ph ph-robot"></i> Gemini AI đang tìm kiếm linh kiện...
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ NOTES MODAL ═══════════ -->
+  <div class="modal-overlay" id="notesModal">
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2><i class="ph ph-note"></i> Ghi chú cho <span id="noteCompName" style="color: var(--primary);"></span></h2>
+        <button class="modal-close" data-close-modal="notesModal">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <textarea id="noteInput" rows="8" placeholder="Nhập ghi chú cho linh kiện này (VD: Dùng cho mạch A, cần thay điện trở 10k...)" style="margin-bottom: 12px;"></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+          <button class="btn btn-outline" id="clearNoteBtn">Xóa ghi chú</button>
+          <button class="btn btn-bom" id="saveNoteBtn"><i class="ph ph-floppy-disk"></i> Lưu ghi chú</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ CONFIRM DIALOG ═══════════ -->
+  <div class="modal-overlay" id="confirmDialog" style="z-index: 10000;">
+    <div class="modal" style="max-width: 380px;">
+      <div class="modal-header">
+        <h2><i class="ph ph-warning-circle" style="color: var(--accent-orange);"></i> <span id="confirmTitle">Xác nhận</span></h2>
+        <button class="modal-close" id="confirmCancelX">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="text-align: center; padding: 24px;">
+        <p id="confirmMessage" style="font-size: 15px; color: var(--text-primary); margin-bottom: 20px;">Bạn có chắc chắn?</p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+          <button class="btn btn-outline" id="confirmCancelBtn" style="min-width: 100px; justify-content: center;">
+            <i class="ph ph-x"></i> Hủy
+          </button>
+          <button class="btn btn-clear-bom" id="confirmOkBtn" style="min-width: 100px; justify-content: center; background: var(--accent-red); color: white;">
+            <i class="ph ph-trash"></i> Xóa
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ TOAST CONTAINER ═══════════ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ═══════════ SCRIPTS ═══════════ -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
