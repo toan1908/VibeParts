@@ -1,8 +1,1 @@
-{
-  "name": "vibe-parts",
-  "version": "1.0.0",
-  "description": "VibeParts - Electronic Components Search & BOM Manager",
-  "scripts": {
-    "dev": "npx -y serve ."
-  }
-}
+{\n  "name": "vibe-parts",\n  "version": "1.0.0",\n  "scripts": {\n    "dev": "webpack serve --mode development",\n    "start": "node server.js",\n    "build": "webpack --mode production",\n    "lint": "eslint .",\n    "format": "prettier --write .",\n    "test": "jest",\n    "quality": "eslint . && jest"\n  },\n  "devDependencies": {\n    "eslint": "^7.32.0",\n    "prettier": "^2.5.1",\n    "jest": "^27.4.5",\n    "serve": "^14.0.1"\n  }\n}
