@@ -27,7 +27,6 @@ function loadCustomComponents() {
 // ── Save custom components to localStorage ──
 function saveCustomComponents() {
   try {
-    // Custom components are those with isOnline flag or id starting with 'custom-' or 'online-'
     const customs = COMPONENTS.filter(c =>
       c.isOnline || (c.id && (c.id.startsWith('custom-') || c.id.startsWith('online-')))
     );
@@ -63,12 +62,10 @@ function detectCategory(name, desc) {
   return 'ic'; // default to IC
 }
 
-// ── Model fallback list (try each until one works) ──
+// ── Model fallback list (SỬA LẠI TÊN CHUẨN THỰC TẾ) ──
 const GEMINI_MODELS = [
-  'gemini-2.5-flash',
-  'gemini-3.1-flash',
   'gemini-2.0-flash',
-  'gemini-1.5-flash' // Đã xóa model bị lặp
+  'gemini-1.5-flash'
 ];
 
 // ── Build prompt ──
@@ -87,7 +84,7 @@ Trả về ĐÚNG 1 mảng JSON (không có text ngoài JSON) chứa 1-5 linh ki
   "price_vnd": Giá tham khảo tại Việt Nam (chỉ số nguyên, đơn vị VND, ước lượng hợp lý)
 }
 
-Chỉ trả về JSON array thuần túy.
+Chỉ trả về JSON array thuần túy. KHÔNG dùng markdown.
 Giá tham khảo tại Việt Nam hợp lý (VD: IC đơn giản 3000-15000đ, MCU 25000-150000đ, module 50000-200000đ).`;
 }
 
@@ -103,7 +100,7 @@ async function tryModel(modelName, prompt, apiKey) {
       generationConfig: {
         temperature: 0.3,
         maxOutputTokens: 2048,
-        responseMimeType: "application/json" // QUAN TRỌNG: Ép output 100% là JSON
+        responseMimeType: "application/json"
       },
     }),
   });
@@ -112,7 +109,7 @@ async function tryModel(modelName, prompt, apiKey) {
     const errData = await response.json().catch(() => ({}));
     const errMsg = errData.error?.message || '';
 
-    // Quota exceeded → throw special error so we can try next model
+    // Quota exceeded
     if (response.status === 429 || errMsg.toLowerCase().includes('quota') || errMsg.toLowerCase().includes('rate')) {
       const error = new Error(errMsg);
       error.isQuota = true;
@@ -120,17 +117,14 @@ async function tryModel(modelName, prompt, apiKey) {
       throw error;
     }
 
-    if (response.status === 400) {
-      const error = new Error('API key không hợp lệ.');
-      error.isInvalidKey = true;
-      throw error;
-    }
-    if (response.status === 403) {
-      const error = new Error('API key bị từ chối. Vui lòng kiểm tra lại.');
+    // SỬA: Chỉ ngắt API với lỗi 403 (Forbidden) hoặc 401 (Unauthorized)
+    if (response.status === 403 || response.status === 401) {
+      const error = new Error('API key bị từ chối hoặc không có quyền truy cập. Vui lòng kiểm tra lại.');
       error.isInvalidKey = true;
       throw error;
     }
 
+    // Nếu bị lỗi 400 (model không tồn tại) hoặc lỗi khác, ném ra ngoài để vòng lặp tự nhảy sang model tiếp theo
     throw new Error(errMsg || `Lỗi API (${modelName}): ${response.status}`);
   }
 
@@ -160,15 +154,16 @@ export async function searchOnline(query) {
 
     } catch (err) {
       if (err.isInvalidKey) {
-        throw new Error(err.message);
+        throw new Error(err.message); // Dừng hoàn toàn nếu API Key sai
       }
       if (err.isQuota) {
         console.warn(`[VibeParts] ⚠️ Quota exceeded for ${model}, trying next...`);
         quotaErrors.push(err);
-        continue; // try next model
+        continue;
       }
+      console.warn(`[VibeParts] ⚠️ Failed on ${model}: ${err.message}. Trying next...`);
       lastError = err;
-      continue; // try next model on any error
+      continue; // Có bất cứ lỗi gì (như model chưa ra mắt) thì nhảy sang model tiếp!
     }
   }
 
@@ -177,8 +172,7 @@ export async function searchOnline(query) {
     throw new Error(
       `Tất cả các model AI đã hết quota miễn phí. Vui lòng:\n` +
       `• Đợi 1-2 phút rồi thử lại\n` +
-      `• Hoặc sử dụng API key khác\n` +
-      `• Hoặc nâng cấp lên gói trả phí tại ai.google.dev`
+      `• Hoặc sử dụng API key khác`
     );
   }
 
@@ -187,67 +181,7 @@ export async function searchOnline(query) {
 
 // ── Parse AI response text into components ──
 function parseAIResponse(text, query) {
-  let parsed;
-  try {
-    // Không cần dùng regex nữa do đã ép trả về MIME type là application/json
-    parsed = JSON.parse(text.trim());
-  } catch (e) {
-    throw new Error('Không thể phân tích kết quả từ AI. Vui lòng thử lại.');
-  }
+  let jsonStr = text.trim();
 
-  if (!Array.isArray(parsed)) {
-    parsed = [parsed];
-  }
-
-  // Convert to our component format
-  return parsed.map(item => ({
-    id: 'online-' + (item.name || 'unknown').toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Date.now().toString(36),
-    name: item.name || 'Unknown',
-    category: detectCategory(item.name || '', item.description || ''),
-    manufacturer: item.manufacturer || 'Unknown',
-    package: item.package || 'N/A',
-    description: item.description || '',
-    specs: {
-      voltage: item.voltage || 'N/A',
-      current: item.current || 'N/A',
-      interface: item.interface || 'N/A',
-      package: item.package || 'N/A',
-    },
-    price: parseInt(item.price_vnd) || 10000,
-    datasheetUrl: '',
-    shopeeUrl: `https://shopee.vn/search?keyword=${encodeURIComponent(item.name || query)}`,
-    isOnline: true,
-  }));
-}
-
-// ── Add a component from online search to the main database ──
-export function addOnlineComponent(component) {
-  // Check if already exists
-  const existing = COMPONENTS.find(c => c.name.toLowerCase() === component.name.toLowerCase());
-  if (existing) {
-    return { success: false, message: `${component.name} đã tồn tại trong database.`, existingId: existing.id };
-  }
-
-  // Clean the id (remove timestamp to make it stable)
-  const stableId = 'custom-' + component.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-  component.id = stableId;
-
-  COMPONENTS.push(component);
-  saveCustomComponents();
-
-  return { success: true, message: `Đã thêm ${component.name} vào database!`, newId: stableId };
-}
-
-// ── Remove a custom component ──
-export function removeCustomComponent(componentId) {
-  const idx = COMPONENTS.findIndex(c => c.id === componentId);
-  if (idx >= 0) {
-    COMPONENTS.splice(idx, 1);
-    saveCustomComponents();
-    return true;
-  }
-  return false;
-}
-
-// ── Initialize: load custom components ──
-loadCustomComponents();
+  // KHÔI PHỤC LẠI BỘ LỌC REGEX: Bảo vệ JSON.parse khỏi thẻ markdown rác của AI
+  const jsonMatch = jsonStr.match(/
