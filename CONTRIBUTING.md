@@ -1,9 +1,9 @@
 # Contributing to VibeParts
 
-Welcome! We're excited that you're interested in contributing to VibeParts! Below are some guidelines to get you started.
+Welcome! I'm excited that you're interested in contributing to VibeParts! Below are some guidelines to get you started.
 
 ## Code of Conduct
-We expect all contributors to adhere to the following code of conduct:
+I expect all contributors to adhere to the following code of conduct:
 - Be respectful and kind to others.
 - Be open to feedback and new ideas.
 - No harassment, discrimination, or any form of abusive behavior.
