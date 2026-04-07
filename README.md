@@ -2,7 +2,7 @@
 
 VibeParts is an All-in-One Static Web App tailored for electronics engineers, hobbyists, and makers. This tool helps you quickly look up electronic components, manage your Bill of Materials (BOM), perform engineering calculations, and leverage AI to fetch real-world component specifications directly in your browser—no backend or complex installation required.
 
-🌐 Live Demo: Experience VibeParts here
+🌐 Live Demo: [Experience VibeParts here](https://toan1908.github.io/VibeParts/)
 
 ✨ Key Features
 
