@@ -1,34 +1,54 @@
 # VibeParts
 
-VibeParts la mot static web app de tim kiem linh kien dien tu, quan ly BOM, luu ghi chu, danh dau yeu thich va su dung bo calculator ky thuat ngay trong trinh duyet.
+VibeParts is an All-in-One Static Web App tailored for electronics engineers, hobbyists, and makers. This tool helps you quickly look up electronic components, manage your Bill of Materials (BOM), perform engineering calculations, and leverage AI to fetch real-world component specifications directly in your browser—no backend or complex installation required.
 
-## Chay local
+🌐 Live Demo: Experience VibeParts here
 
-```bash
-npm start
-```
+✨ Key Features
 
-Neu ban khong muon dung npm, co the mo truc tiep `index.html` trong trinh duyet, nhung chay qua local server se on dinh hon cho ES modules.
+🔍 Lightning-Fast Local Search: Instantly look up offline components using the Ctrl + K shortcut. Filter results by various categories including ICs, MCUs, Sensors, Resistors, and more.
 
-## Cau truc
+🤖 AI-Powered Online Search (Gemini API): Can't find a component in the built-in library? Just type its name, and the AI will automatically retrieve technical specs, package types, and estimated prices, then seamlessly save it to your local database for future use.
 
-- `index.html`: giao dien chinh
-- `css/styles.css`: toan bo giao dien
-- `js/`: logic tim kiem, BOM, ghi chu, calculator va online search
+📋 Professional BOM (Bill of Materials) Management:
 
-## Deploy len GitHub Pages
+Quickly build and organize your parts list for any project.
 
-Repo nay la mot static site, vi vay co the publish truc tiep bang GitHub Pages.
-Trong repo GitHub, bo source duoc dat trong thu muc `docs/` de Pages co the deploy truc tiep tu nhanh `main`.
+Track your overall budget with intuitive distribution charts.
 
-1. Push toan bo source len nhanh `main`
-2. Vao `Settings -> Pages`
-3. Chon `Deploy from a branch`
-4. Chon branch `main` va folder `/docs`
-5. Luu lai va doi GitHub Pages build
+Offline Storage: All your data is saved securely in your browser.
 
-URL mac dinh cua project site se la:
+Export comprehensive reports in multiple formats: PDF and CSV.
 
-`https://toan1908.github.io/VibeParts/`
+🧮 Engineering Calculators: A built-in suite of essential tools designed to speed up your electronics workflow:
 
-File `.nojekyll` da duoc them san de GitHub Pages phuc vu static files truc tiep.
+Ohm's Law, Voltage Dividers, and LED Current Limiting Resistors.
+
+NE555 Timer, RC/RLC Filters, and Operational Amplifiers (Op-Amp) calculators.
+
+Resistor Color Codes, SMD Resistor Codes, and Capacitor Codes decoders.
+
+⚖️ Visual Component Comparison: Place components side-by-side to easily compare their technical specifications and make the best design choices.
+
+🚀 Getting Started
+
+Since VibeParts is a purely static web application, getting started is extremely simple:
+
+Clone the repository:
+
+git clone [https://github.com/toan1908/VibeParts.git](https://github.com/toan1908/VibeParts.git)
+
+
+Open the index.html file directly in your web browser or use a simple local server (like Live Server in VS Code).
+
+(Optional) To enable the AI Search feature, get a free API Key from Google AI Studio and enter it in the app's settings.
+
+🛠️ Technologies Used
+
+HTML5, CSS3, JavaScript (Vanilla ES6+)
+
+Tailwind CSS - For responsive and modern styling.
+
+Google Gemini API - For AI-powered component data retrieval.
+
+LocalStorage - For secure, client-side data management.
