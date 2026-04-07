@@ -1,0 +1,8 @@
+{
+  "name": "vibe-parts",
+  "version": "1.0.0",
+  "description": "VibeParts - Electronic Components Search & BOM Manager",
+  "scripts": {
+    "dev": "npx -y serve ."
+  }
+}
