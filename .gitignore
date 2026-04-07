@@ -1,0 +1,22 @@
+# Node.js
+node_modules/
+package-lock.json
+
+# npm
+npm-debug.log*
+
+# IDE files
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.vscode/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+/dist/
+/build/
+*.tgz
