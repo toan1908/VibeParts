@@ -1,54 +1,166 @@
-# VibeParts
+# ⚡ VibeParts
 
-VibeParts is an All-in-One Static Web App tailored for electronics engineers, hobbyists, and makers. This tool helps you quickly look up electronic components, manage your Bill of Materials (BOM), perform engineering calculations, and leverage AI to fetch real-world component specifications directly in your browser—no backend or complex installation required.
+<p align="center">
+  <b>All-in-one electronics toolkit for engineers, makers, and hobbyists</b><br/>
+  <sub>Search components • Manage BOM • Run calculations • Powered by AI</sub>
+</p>
 
-🌐 Live Demo: [Experience VibeParts here](https://toan1908.github.io/VibeParts/)
+<p align="center">
+  <img src="https://img.shields.io/badge/status-active-success?style=flat"/>
+  <img src="https://img.shields.io/badge/built%20with-JavaScript-yellow?style=flat"/>
+  <img src="https://img.shields.io/badge/AI-Gemini-blue?style=flat"/>
+  <img src="https://img.shields.io/badge/license-MIT-green?style=flat"/>
+</p>
 
-✨ Key Features
+---
 
-🔍 Lightning-Fast Local Search: Instantly look up offline components using the Ctrl + K shortcut. Filter results by various categories including ICs, MCUs, Sensors, Resistors, and more.
+## 🚀 Overview
 
-🤖 AI-Powered Online Search (Gemini API): Can't find a component in the built-in library? Just type its name, and the AI will automatically retrieve technical specs, package types, and estimated prices, then seamlessly save it to your local database for future use.
+**VibeParts** is a browser-based electronics toolkit that helps you:
 
-📋 Professional BOM (Bill of Materials) Management:
+* Quickly search electronic components
+* Manage your BOM (Bill of Materials)
+* Perform common engineering calculations
+* Use AI to fetch component specifications
 
-Quickly build and organize your parts list for any project.
+👉 No backend. No setup. Just open and use.
 
-Track your overall budget with intuitive distribution charts.
+---
 
-Offline Storage: All your data is saved securely in your browser.
+## ✨ Features
 
-Export comprehensive reports in multiple formats: PDF and CSV.
+### 🔍 Component Search
 
-🧮 Engineering Calculators: A built-in suite of essential tools designed to speed up your electronics workflow:
+* Fast lookup with `Ctrl + K`
+* Local database with AI-powered expansion
 
-Ohm's Law, Voltage Dividers, and LED Current Limiting Resistors.
+### 🤖 AI-Powered Lookup
 
-NE555 Timer, RC/RLC Filters, and Operational Amplifiers (Op-Amp) calculators.
+* Automatically retrieves:
 
-Resistor Color Codes, SMD Resistor Codes, and Capacitor Codes decoders.
+  * Specifications
+  * Package info
+  * Estimated pricing
+* Saves results directly to your local database
 
-⚖️ Visual Component Comparison: Place components side-by-side to easily compare their technical specifications and make the best design choices.
+### 📦 BOM Manager
 
-🚀 Getting Started
+* Create and manage component lists
+* Track total project cost
+* Designed for real-world workflows
 
-Since VibeParts is a purely static web application, getting started is extremely simple:
+### 📊 Export
 
-Clone the repository:
+* Export BOM to:
 
-git clone [https://github.com/toan1908/VibeParts.git](https://github.com/toan1908/VibeParts.git)
+  * PDF
+  * CSV
 
+### 🧮 Engineering Calculators
 
-Open the index.html file directly in your web browser or use a simple local server (like Live Server in VS Code).
+* Ohm’s Law
+* Voltage Divider
+* LED Resistor
+* NE555 Timer
+* RC / RLC Filters
+* Op-Amp tools
+* Resistor & Capacitor decoder
 
-(Optional) To enable the AI Search feature, get a free API Key from Google AI Studio and enter it in the app's settings.
+### 💾 Local-first Architecture
 
-🛠️ Technologies Used
+* Data stored in **LocalStorage**
+* No server required
+* Private and offline-friendly
 
-HTML5, CSS3, JavaScript (Vanilla ES6+)
+---
 
-Tailwind CSS - For responsive and modern styling.
+## 🛠 Tech Stack
 
-Google Gemini API - For AI-powered component data retrieval.
+* **Frontend:** HTML, CSS, JavaScript
+* **Styling:** Tailwind CSS
+* **AI:** Google Gemini API
+* **Storage:** LocalStorage
 
-LocalStorage - For secure, client-side data management.
+---
+
+## ⚡ Quick Start
+
+```bash
+git clone https://github.com/toan1908/VibeParts.git
+cd VibeParts
+```
+
+### Run locally
+
+```bash
+npx serve .
+```
+
+Or simply open:
+
+```bash
+index.html
+```
+
+---
+
+## 🔑 AI Setup (Optional)
+
+To enable AI features:
+
+1. Go to: https://aistudio.google.com/
+2. Generate a Gemini API key
+3. Add the key in the app’s **Settings**
+
+---
+
+## 📁 Project Structure
+
+```
+.
+├── index.html
+├── style.css
+├── script.js
+└── assets/
+```
+
+---
+
+## 🎯 Use Cases
+
+* ⚡ Quickly look up components during circuit design
+* 🧠 Validate ideas using AI
+* 📦 Manage BOM for personal or startup projects
+* 🧮 Replace multiple engineering tools with one app
+
+---
+
+## 🔮 Roadmap
+
+* [ ] Cloud sync
+* [ ] Multi-project workspace
+* [ ] Component comparison tool
+* [ ] Advanced dark mode
+* [ ] Plugin system
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+```
+fork → create branch → commit → pull request
+```
+
+---
+
+## 📄 License
+
+MIT License © 2026
+
+---
+
+## ⭐ Support
+
+If you find this project useful, consider giving it a ⭐
